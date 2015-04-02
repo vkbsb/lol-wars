@@ -1,19 +1,19 @@
-    var app = angular.module("MyTest", []);
+    var app = angular.module("MyTest", ['ngMaterial']);
 
     app.controller('TestController', ['$scope', '$http', function($scope, $http){
 
     $scope.key = '4befbf6c-67bf-4d9e-b159-114aed30e108';
     base_path = 'https://euw.api.pvp.net/api/lol/euw/v1.4/'; 
     $scope.summonerInfo = "";
-    $scope.summoner = "guest";
+    // $scope.summoner = "Summoner Name";
     $scope.fetching = false;
     $scope.forceRefresh = false;
     $scope.recent = {};
     $scope.champFreq = {};
     $scope.avgWards = 0;
-    $scope.gameState = -1;
+    $scope.hideConfig = false;
 
-    $scope.$watch(function(){return $scope.recent}, function(recent, oldRecent) {
+/*    $scope.$watch(function(){return $scope.recent}, function(recent, oldRecent) {
                 var champFreq = {};
                 var totalWardsPlaced = 0;
                 for(var i = 0; i < recent.games.length; i++){
@@ -70,7 +70,7 @@
                }
                $scope.avgWards = Math.round(totalWardsPlaced / recent.games.length);
                $scope.champFreq = champFreq;
-    });
+    }); */
 
     //https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=all&api_key=4befbf6c-67bf-4d9e-b159-114aed30e108
     //get the champion data
@@ -92,10 +92,6 @@
         $scope.recent = JSON.parse(localStorage["recent"]);
     }
 
-    $scope.time_to_mins = function(value){
-        return Math.round(value / 60);
-    }
-
     $scope.fetch_summonerInfo = function(){
      
      if(localStorage.hasOwnProperty('summonerInfo') && $scope.forceRefresh == false){
@@ -103,7 +99,6 @@
         if(savedSummoner.hasOwnProperty($scope.summoner.toLowerCase())){
             $scope.summonerInfo = savedSummoner;
             $scope.summoner = savedSummoner.name;
-            $scope.gameState = 0;
         }
      }
      $scope.fetching = true;
@@ -111,7 +106,7 @@
 
      $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key).success(function(data) {
          $scope.fetching = false; 
-         $scope.gameState = 0;
+         $scope.true = 0;
          $scope.summonerInfo = data;
          localStorage["summonerInfo"] =  JSON.stringify(data); 
          

@@ -14,8 +14,13 @@ app.directive('lolMatch', function(){
 app.controller("CardButtonHandler", ['$scope', function($scope){
     $scope.stat_selected = false;
 
+    $scope.time_to_mins = function(value){
+        return Math.round(value / 60);
+    }
+
     $scope.stat_clicked = function(value, cardIndex){
         //$scope.stat_selected = true;
         $scope.recent.games.splice(cardIndex, 1);
+        $scope.gameState=0;
     }
 }]);
