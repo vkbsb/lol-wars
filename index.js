@@ -11,6 +11,7 @@
     $scope.recent = {};
     $scope.champFreq = {};
     $scope.avgWards = 0;
+    $scope.gameState = -1;
 
     $scope.$watch(function(){return $scope.recent}, function(recent, oldRecent) {
                 var champFreq = {};
@@ -91,6 +92,10 @@
         $scope.recent = JSON.parse(localStorage["recent"]);
     }
 
+    $scope.time_to_mins = function(value){
+        return Math.round(value / 60);
+    }
+
     $scope.fetch_summonerInfo = function(){
      
      if(localStorage.hasOwnProperty('summonerInfo') && $scope.forceRefresh == false){
@@ -98,6 +103,7 @@
         if(savedSummoner.hasOwnProperty($scope.summoner.toLowerCase())){
             $scope.summonerInfo = savedSummoner;
             $scope.summoner = savedSummoner.name;
+            $scope.gameState = 0;
         }
      }
      $scope.fetching = true;
@@ -105,6 +111,7 @@
 
      $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key).success(function(data) {
          $scope.fetching = false; 
+         $scope.gameState = 0;
          $scope.summonerInfo = data;
          localStorage["summonerInfo"] =  JSON.stringify(data); 
          
