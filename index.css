@@ -1,0 +1,52 @@
+    .card {
+        width: 90%;
+        height: 100%;
+        margin: 3px;
+        //border: 1px solid black;
+        //border-radius: 5px;
+        padding: 10px;
+   }
+        .heading {
+            min-height: 1em;
+            line-height: 1em;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .row {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .win { 
+            background-color: #00ff00;
+        }
+        .loss { 
+            background-color: #ff0000;
+        }
+
+        .cardwindow { 
+            width: 200px;
+            height: 370px;
+            overflow: hidden;
+            //border: solid black 1px;
+        -webkit-box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
+        -moz-box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
+        box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
+ 
+        }
+
+        td{ 
+            padding: 5px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .lowerBetter {
+            background-color: #FF4747;
+        }
+
+        .higherBetter {
+            background-color: #47D147;
+        }
