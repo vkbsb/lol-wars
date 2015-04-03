@@ -50,3 +50,8 @@
         .higherBetter {
             background-color: #47D147;
         }
+        
+        .opponentSelection{
+          padding: 2px; 
+            width: 100%;
+        }

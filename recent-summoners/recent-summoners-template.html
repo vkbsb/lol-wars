@@ -1,0 +1,3 @@
+<div ng-repeat="(key, details) in recentSummoners">
+  <md-button class="opponentSelection" ng-disabled="isOffline(key)"> {{details.name}} </md-button>
+</div>

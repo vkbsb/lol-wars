@@ -7,12 +7,19 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.js"></script>
     
+    <!-- firebase -->
+    <script src="https://cdn.firebase.com/js/client/2.2.2/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script>
+    
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1" />
-    
+
     <script type="text/javascript" src="index.js"> </script> 
     <script type="text/javascript" src="lol-match/lol-match.js"> </script>
+    <script type="text/javascript" src="recent-summoners/recent-summoners.js"></script>
+    
     <link rel="stylesheet" type="text/css" href="index.css"> </link>
 </head>
 <body ng-app="MyTest">
@@ -22,19 +29,13 @@
         <div class="card" ng-hide="gameState">
               <md-input-container>
                   <label>Summoner Name</label>
-                  <input  placeholder="Yours">
+                  <input  placeholder="Yours" ng-model="summoner">
               </md-input-container>
-              
-              <md-input-container>
-                  <label>Summoner Name</label>
-                  <input placeholder="Enemy">
-              </md-input-container>
-              
-            <!--<input type="text" ng-model="summoner" text="Your Summoner Name"> </input> -->
-            <!--<input type="text" ng-model="opponent" text="Opponet Summoner Name"> </input>-->
+
+            <!-- show recent summoners you played against -->
+            <recent-summoners></recent-summoners>
             
-            <!--<button  ng-disable="fetching">GetData</button>-->
-            <md-button ng-click="fetch_summonerInfo()" class="md-raised">Start Game</md-button>
+            <md-button ng-click="fetch_summonerInfo()" class="md-primary opponentSelection">Fetch List</md-button>
         </div>
         <div ng-repeat="game in recent.games track by $index">
             <lol-match > </lol-match>
