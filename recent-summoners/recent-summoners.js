@@ -7,7 +7,7 @@ app.directive("recentSummoners", function(){
 });
 
 
-app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', function($scope, $http, $firebaseObject){
+app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', '$firebaseArray', function($scope, $http, $firebaseObject, $firebaseArray){
   
   //we want to get the summoner info whenever the recent variable updates.
   $scope.$watch("recent", function(){    
@@ -53,9 +53,41 @@ app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', function($
       }else{
         return true;
       }
-      // Firebase.ServerValue.TIMESTAMP - 
     };
+    
+    //function for handling the case where an opponent is selected.
+    $scope.opponentSelected = function(key){
+        var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
+        var game_ts = new Date().getTime();
+        var ref = new Firebase($scope.firebase_url + summonerObj.id + "/games/"+ game_ts);
         
+        var obj = $firebaseObject(ref);        
+        //add additional stuff to the object so it can be ready to access data.        
+        obj.particpents = [summonerObj.id, parseInt(key)];
+        obj.agreed = 1;
+        obj.rounds = [];
+        obj.$save();
+        //save the gameData Object ref from FireBase.
+        $scope.gameData = obj;
+        
+        //enable three way binding with it.
+        obj.$bindTo($scope, "gameData");
+        
+        
+        //send message to the opponent to start game.
+        var reqRef = new Firebase($scope.firebase_url + key + "/requests" );
+        var reqsObj = $firebaseArray(reqRef);
+        reqsObj.$add({
+            "type" : "game_req",
+            "gameTag" : game_ts,
+            "summoner" : summonerObj
+        });
+        
+        //hide the initial screen and start showing the cards.
+//        $scope.hideConfig = true;
+        $scope.gameState = 0;
+    };
+    
     $scope.sendPulse = function(){
         if(typeof($scope.summoner) == "undefined"){
           return;

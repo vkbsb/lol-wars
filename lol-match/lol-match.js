@@ -21,6 +21,6 @@ app.controller("CardButtonHandler", ['$scope', function($scope){
     $scope.stat_clicked = function(value, cardIndex){
         //$scope.stat_selected = true;
         $scope.recent.games.splice(cardIndex, 1);
-        $scope.gameState=0;
+        $scope.gameState = 0;
     }
 }]);

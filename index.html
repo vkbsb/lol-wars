@@ -26,7 +26,7 @@
     <div ng-controller="TestController">
         
         <div class="cardwindow">
-        <div class="card" ng-hide="gameState">
+        <div class="card" ng-hide="gameState > -1">
               <md-input-container>
                   <label>Summoner Name</label>
                   <input  placeholder="Yours" ng-model="summoner">
@@ -37,10 +37,17 @@
             
             <md-button ng-click="fetch_summonerInfo()" class="md-primary opponentSelection">Fetch List</md-button>
         </div>
+        
+        <div class="card" ng-hide="gameState > 0">
+            Waiting for your partner.
+        </div>
+
         <div ng-repeat="game in recent.games track by $index">
             <lol-match > </lol-match>
         </div>
         </div>
+        {{myRequest? showRequest() : console.log("wasaaa")}}
+<!--        {{requests.length > 0? showRequest(0) : console.log("hello")}}-->
     </div>
 </body>
 </html>
