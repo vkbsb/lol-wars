@@ -11,16 +11,21 @@ app.directive('lolMatch', function(){
 });
 
 
-app.controller("CardButtonHandler", ['$scope', function($scope){
+app.controller("CardButtonHandler", ['$scope', 'CONFIG', function($scope, CONFIG){
     $scope.stat_selected = false;
 
     $scope.time_to_mins = function(value){
         return Math.round(value / 60);
     }
-
+    
     $scope.stat_clicked = function(value, cardIndex){
-        //$scope.stat_selected = true;
-        $scope.recent.games.splice(cardIndex, 1);
-        $scope.gameState = 0;
+        if($scope.gameState != CONFIG.MY_TURN){
+            return;
+        }
+        console.log("You have selected: ", value, cardIndex);
+        //set the game state == 3 We are waiting for the result of
+        //this round.
+        $scope.gameState == CONFIG.ROUND_RESULT;
+//        $scope.recent.games.splice(cardIndex, 1);        
     }
 }]);

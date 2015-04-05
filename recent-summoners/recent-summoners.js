@@ -7,13 +7,18 @@ app.directive("recentSummoners", function(){
 });
 
 
-app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', '$firebaseArray', function($scope, $http, $firebaseObject, $firebaseArray){
+app.controller("SummonerList", [
+  '$scope', '$http', '$firebaseObject', '$firebaseArray', 
+  function($scope, $http, $firebaseObject, $firebaseArray){
   
   //we want to get the summoner info whenever the recent variable updates.
   $scope.$watch("recent", function(){    
     if(typeof($scope.recent.games) == "undefined"){
         return;
     }
+    //update the cards that we have for this game.
+    $scope.updateMyCards();
+      
     var summonerList = "";
     for(var i = 0; i < $scope.recent.games[0].fellowPlayers.length; i++){
       // console.log($scope.recent.games[0].fellowPlayers[i]);
@@ -27,10 +32,7 @@ app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', '$firebase
     // https://euw.api.pvp.net/api/lol/euw/v1.4/summoner/19248048,40267431,44117932,67655352?api_key=4befbf6c-67bf-4d9e-b159-114aed30e108
     var url = "https://euw.api.pvp.net/api/lol/euw/v1.4/summoner/" + summonerList + "?api_key=" + $scope.key;
     $http.get(url).success(function(data){
-      for(var key in data){
-        data[key].online = false;
-      }
-      $scope.recentSummoners = data;
+        $scope.recentSummoners = data;
       
       //register the firebase data into the $scope variable so we can modify it on the fly.
       for(var key in $scope.recentSummoners){
@@ -55,6 +57,25 @@ app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', '$firebase
       }
     };
     
+    $scope.updateMyCards = function(){
+        $scope.myCards = [];
+        for(var i = 0; i < $scope.recent.games.length; i++){
+            var card = {};
+            var stats = $scope.recent.games[i].stats;
+            card["ch"] = $scope.recent.games[i].championId;
+            card["v"] = stats.win; //victory
+            card["k"] = stats.championsKilled? stats.championsKilled : 0; //kills
+            card["d"] = stats.numDeaths? stats.numDeaths : 0; //deaths
+            card["a"] = stats.assists? stats.assists : 0; //assists
+            card["wp"] = stats.wardPlaced? stats.wardPlaced : 0; //wards placed
+            card["tk"] = stats.turretsKilled? stats.turretsKilled : 0; //turrets destroyed.
+            card["time"] = stats.timePlayed; //match duration.
+            
+            $scope.myCards.push(card);
+        }
+        console.log($scope.myCards);
+    };
+    
     //function for handling the case where an opponent is selected.
     $scope.opponentSelected = function(key){
         var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
@@ -66,12 +87,15 @@ app.controller("SummonerList", ['$scope', '$http', '$firebaseObject', '$firebase
         obj.particpents = [summonerObj.id, parseInt(key)];
         obj.agreed = 1;
         obj.rounds = [];
+        obj[summonerObj.id+"_cards"] = $scope.myCards;
+        obj[parseInt(key) + "_cards"] = [{"test": "testval"}, {"test2": "test2val"}];
         obj.$save();
         //save the gameData Object ref from FireBase.
         $scope.gameData = obj;
         
         //enable three way binding with it.
-        obj.$bindTo($scope, "gameData");
+        obj.$bindTo($scope, "gameData");        
+        $scope.$watch("gameData", $scope.handleGameDataUpdate);
         
         
         //send message to the opponent to start game.

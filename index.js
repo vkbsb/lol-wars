@@ -1,11 +1,21 @@
     var app = angular.module("MyTest", ['ngMaterial', 'firebase']);
     
-    app.constant("FIREBASE_URL", "https://codepen-public.firebaseio.com/firebase1demo/codepen/");
-    app.constant("RIOT_KEY", '4befbf6c-67bf-4d9e-b159-114aed30e108');
-    app.constant("RIOT_SUMMONER_URL", "https://euw.api.pvp.net/api/lol/euw/v1.4/summoner");
+//    app.constant("FIREBASE_URL", "https://codepen-public.firebaseio.com/firebase1demo/codepen/");
+//    app.constant("RIOT_KEY", '4befbf6c-67bf-4d9e-b159-114aed30e108');
+//    app.constant("RIOT_SUMMONER_URL", "https://euw.api.pvp.net/api/lol/euw/v1.4/summoner");
+    app.constant("CONFIG", {
+           "NOT_STARTED" : -1,
+           "WAIT_FOR_OPPONENT_JOIN" : 0,
+           "MY_TURN" : 1,
+           "OPPONENT_TURN" : 2,
+           "ROUND_RESULT" : 3,
+           "ENDED" : 4
+    });
 
-app.controller('TestController', ['$scope', '$http', '$firebaseArray', '$mdDialog', '$firebaseObject',
-function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
+app.controller('TestController', [
+'$scope', '$http', '$firebaseArray', '$mdDialog', '$firebaseObject',
+'CONFIG',
+function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
 
     base_path = 'https://euw.api.pvp.net/api/lol/euw/v1.4/'; 
     
@@ -24,6 +34,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
     $scope.forceRefresh = false;
     $scope.recent = {};
     $scope.gameData = {};
+    $scope.myCards = [];
     // $scope.champFreq = {};
     // $scope.avgWards = 0;
 //    $scope.hideConfig = false; 
@@ -69,7 +80,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
      $scope.fetching = true;
 
 
-     $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key).success(function(data) {
+     $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key)
+         .success(function(data) {
          $scope.fetching = false; 
          $scope.true = 0;
          $scope.summonerInfo = data;
@@ -95,7 +107,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
                     $scope.myRequest = newvalue[len-1];
                     //we want to show the challenge request allert only if the game
                     //state is set to -1;
-                    if(newvalue[len-1].type == "game_req" && $scope.state == -1){
+                    if(newvalue[len-1].type == "game_req"){
+                        if($scope.gameState == CONFIG.NOT_STARTED){
                         $scope.showRequest(newvalue[len-1]);
                         
                         //Initialize the gameData object with the corresponding game object.
@@ -104,11 +117,22 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
                                 "/games/"+ newvalue[len-1].gameTag;                        
                         var gDataRef = new Firebase(refUrl);
                         var gDataObj = $firebaseObject(gDataRef);
+                            
+                        gDataObj.$loaded(function(data){
+                            gDataObj.agreed += 1;
+                            gDataObj[summonerId + "_cards"] = $scope.myCards;
+                            gDataObj.$save();
+                        });
+                            
                         $scope.gameData = gDataObj;
-                        gDataObj.$bindTo($scope, "gameData");
+                        gDataObj.$bindTo($scope, "gameData").then(function(){
+                            $scope.gameState = CONFIG.OPPONENT_TURN;                  
+                            $scope.$watch("gameData", $scope.handleGameDataUpdate);
+                        });
+                        
                         
                         //$scope.gameState = 1; //starting the game.
-                    }else{
+                        }else{
                         //post back a response to the sender that you are not available for game.
                         var reqRef = new Firebase($scope.firebase_url + newvalue[len-1].summoner.id + "/requests" );
                         var reqsObj = $firebaseArray(reqRef);
@@ -116,6 +140,15 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
                             "type" : "game_rejected",
                             "summoner" : summonerObj
                         });
+                        }
+                    }else if(newvalue[len-1].type == "game_rejected"){                        
+                        $scope.gameState = CONFIG.NOT_STARTED;
+                        var confirm = $mdDialog.alert()                        
+                        .title('Player Busy')
+                        .content(newvalue[len-1].summoner.name + ' is playing a match. Pick someone else.')
+                        .ariaLabel('Lucky day')
+                        .ok("Ok");
+                        $mdDialog.show(confirm);    
                     }
                     
                     $scope.requests.$remove(len-1);                    
@@ -150,6 +183,29 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject ){
         .ok("Let's do it");
         $mdDialog.show(confirm);     
     };
+    
+    $scope.handleGameDataUpdate = function(newval, oldvalue){
+        console.log("GameDataUpdate: ", newval);
+        if($scope.gameData.agreed != 2){
+            return;
+        }
+        
+        if($scope.gameState == CONFIG.NOT_STARTED){
+            return;
+        }
+        
+        if($scope.gameState == CONFIG.WAIT_FOR_OPPONENT_JOIN){
+            $scope.gameState = CONFIG.MY_TURN;
+            //we are going to update the game data to send stuff.
+            console.log("Enable the clicks on card")
+        }else if($scope.gameState == CONFIG.OPPONENT_TURN){
+            //we have to wait for the other user's move 
+            console.log("Waiting for Other Users' move");            
+        }else if($scope.gameState == CONFIG.ROUND_RESULT){
+            console.log("Waiting for animation to finish");
+            
+        }
+    }
 
 }]);
 
