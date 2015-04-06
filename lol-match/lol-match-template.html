@@ -1,27 +1,30 @@
 
-            <div class="card"> 
-               <center> <img ng-src="http://lkimg.zamimg.com/shared/riot/images/champions/{{card.ch}}.png"> </img> </center>
+            <div class="card" ng-show="round == $index"> 
+               <center> 
+                   <img ng-src="http://lkimg.zamimg.com/shared/riot/images/champions/{{card.ch}}.png"> </img> 
+                    <br> {{round+1}} / 10
+                </center>
                <div class="row heading">  {{ champData.keys[card.ch] }}  </div>
                <table width="100%">
-                <tr ng-click="stat_selected || stat_clicked(1, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('v', $index)">
                     <td> Result </td> <td>{{ card.v? "Victory" : "Defeat" }}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(2, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('k', $index)">
                     <td> Kills </td> <td>{{card.k}}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(3, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('d', $index)">
                     <td> Deaths </td> <td>{{card.d}}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(4, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('a', $index)">
                     <td> Assists </td> <td>{{card.a}}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(5, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('wp', $index)">
                     <td> Wards Placed </td> <td>{{card.wp}}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(6, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('tk', $index)">
                     <td> Turrets </td> <td>{{card.tk}}</td> 
                 </tr>
-                <tr ng-click="stat_selected || stat_clicked(7, $index)" ng-disabled="stat_selected">
+                <tr ng-click="stat_clicked('time', $index)">
                     <td> Duration </td> <td>{{time_to_mins(card.time)}} Mins</td> 
                 </tr>
                </table>

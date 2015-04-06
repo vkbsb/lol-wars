@@ -12,7 +12,7 @@ app.controller("SummonerList", [
   function($scope, $http, $firebaseObject, $firebaseArray){
   
   //we want to get the summoner info whenever the recent variable updates.
-  $scope.$watch("recent", function(){    
+  $scope.uw_recent = $scope.$watch("recent", function(){    
     if(typeof($scope.recent.games) == "undefined"){
         return;
     }
@@ -84,9 +84,9 @@ app.controller("SummonerList", [
         
         var obj = $firebaseObject(ref);        
         //add additional stuff to the object so it can be ready to access data.        
-        obj.particpents = [summonerObj.id, parseInt(key)];
+        obj.players = [summonerObj.id, parseInt(key)];
         obj.agreed = 1;
-        obj.rounds = [];
+        obj.rounds = ["hello", "test"];
         obj[summonerObj.id+"_cards"] = $scope.myCards;
         obj[parseInt(key) + "_cards"] = [{"test": "testval"}, {"test2": "test2val"}];
         obj.$save();
@@ -95,7 +95,7 @@ app.controller("SummonerList", [
         
         //enable three way binding with it.
         obj.$bindTo($scope, "gameData");        
-        $scope.$watch("gameData", $scope.handleGameDataUpdate);
+        $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
         
         
         //send message to the opponent to start game.

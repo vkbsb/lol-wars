@@ -42,7 +42,7 @@
             Waiting for your partner.
         </div>
 
-        <div ng-repeat="card in myCards track by $index">
+        <div ng-repeat="card in myCards track by $index" ng-class="{'disabledTable':gameState==2}">
             <lol-match > </lol-match>
         </div>
         </div>

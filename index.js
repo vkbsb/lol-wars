@@ -9,13 +9,17 @@
            "MY_TURN" : 1,
            "OPPONENT_TURN" : 2,
            "ROUND_RESULT" : 3,
-           "ENDED" : 4
+           "ENDED" : 4,
+           "CARDINFO": {
+               "gb" : ["k", "a", "wp", "v", "tk"],
+               "lb" : ["time", "d"]
+           }
     });
 
 app.controller('TestController', [
 '$scope', '$http', '$firebaseArray', '$mdDialog', '$firebaseObject',
-'CONFIG',
-function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
+'CONFIG', '$mdToast', '$animate', 
+function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdToast, $animate){
 
     base_path = 'https://euw.api.pvp.net/api/lol/euw/v1.4/'; 
     
@@ -41,6 +45,19 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
     $scope.gameState = -1;
     $scope.isRequestShown = false;
     $scope.summoner = "GiZmOfOrEvEr";
+    $scope.round = 0;
+    $scope.toastPosition = {
+    bottom: false,
+    top: true,
+    left: false,
+    right: true
+  };
+    
+    //list of unwatch functions
+    $scope.uw_requests = null;
+    $scope.uw_recent = null;
+    $scope.uw_gameData = null;
+        
     };
     
     $scope.init();
@@ -65,6 +82,11 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
 //        $scope.recent = JSON.parse(localStorage["recent"]);
 //    }
 
+    $scope.getToastPosition = function() {
+    return Object.keys($scope.toastPosition)
+//      .filter(function(pos) { return $scope.toastPosition[pos]; })
+      .join(' ');
+    };
     
     $scope.fetch_summonerInfo = function(){
      
@@ -75,7 +97,25 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
 //            $scope.summoner = savedSummoner.name;
 //        }
 //     }
+    
+    //unbind all the watchers so we dont' have duplicates
+    if($scope.uw_recent){
+//        console.log("Unbinding recent");
+//        $scope.uw_recent();
+//        $scope.uw_recent = null;
+    }
         
+    if($scope.uw_gameData){
+        console.log("unbinding game data");
+        $scope.uw_gameData();
+        $scope.uw_gameData = null;
+    }
+        
+    if($scope.uw_requests){
+        console.log("unbinding requestS");
+        $scope.uw_requests();
+        $scope.uw_requests = null;
+    }
         
      $scope.fetching = true;
 
@@ -99,7 +139,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
              
              //whenever there is a change in requests array, we want 
              //to show the dialog box for 
-            $scope.$watchCollection("requests", 
+            $scope.uw_requests = $scope.$watchCollection("requests", 
             function(newvalue, oldvalue){
                 console.log("Requests Changed: ", $scope.requests);                
                 var len = newvalue.length;
@@ -126,8 +166,9 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
                             
                         $scope.gameData = gDataObj;
                         gDataObj.$bindTo($scope, "gameData").then(function(){
-                            $scope.gameState = CONFIG.OPPONENT_TURN;                  
-                            $scope.$watch("gameData", $scope.handleGameDataUpdate);
+                            $scope.gameState = CONFIG.OPPONENT_TURN;
+                            $scope.round = 0;
+                            $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
                         });
                         
                         
@@ -168,7 +209,13 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
     
 
     };
-        
+       
+    
+    $scope.checkGameEnd = function(){
+        if($scope.round == 10){
+            //this is the end of game now restart the whole thing.
+        }    
+    }
     
     $scope.showRequest = function(){
         // Appending dialog to document.body to cover sidenav in docs app
@@ -197,13 +244,71 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG){
         if($scope.gameState == CONFIG.WAIT_FOR_OPPONENT_JOIN){
             $scope.gameState = CONFIG.MY_TURN;
             //we are going to update the game data to send stuff.
-            console.log("Enable the clicks on card")
-        }else if($scope.gameState == CONFIG.OPPONENT_TURN){
-            //we have to wait for the other user's move 
-            console.log("Waiting for Other Users' move");            
-        }else if($scope.gameState == CONFIG.ROUND_RESULT){
-            console.log("Waiting for animation to finish");
+            console.log("Enable the clicks on card");
             
+        }else if($scope.gameState == CONFIG.MY_TURN){                        
+            //we set the gameState to ROUND_RESULT so we dont' let the user click on anything else till the card is changed.
+            var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
+            $scope.gameState = CONFIG.ROUND_RESULT;
+            $mdToast.show($mdToast.simple()
+            .content('Round Result: ' + roundData.result)
+            .position($scope.getToastPosition())
+            .hideDelay(2000));
+        
+            setTimeout($scope.handleGameDataUpdate, 2000);
+        }
+        else if($scope.gameState == CONFIG.OPPONENT_TURN){
+            //we have to wait for the other user's move 
+            console.log("OtherPlayer Made Move");    
+            var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
+            if(roundData.hasOwnProperty("result") == false){
+                return;
+            }
+            
+            var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
+            //if i didn't amke the last move and the result was loss then next turn is mine.
+            var result = "loss";
+            if(roundData.result == "loss" && summonerObj.id != roundData.id){
+                console.log("It's my turn now.");
+                $scope.gameState = CONFIG.MY_TURN; 
+                result = "win. Your turn now." ;
+            }else{
+                if(roundData.result == "win"){
+                    result = "loss";    
+                }else{
+                    result = roundData.result;
+                }
+                result += ". Opponents' turn again";
+            }
+            
+            //show toast with current rounds' result.
+            $mdToast.show($mdToast.simple()
+            .content('Round Result: ' + result)
+            .position($scope.getToastPosition())
+            .hideDelay(2000));
+            $scope.round += 1;
+            
+            $scope.checkGameEnd();
+            
+        }else if($scope.gameState == CONFIG.ROUND_RESULT){
+            console.log("Animation Finished, selecting Next Turn.");
+            var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
+            var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
+            
+            if(roundData.result == "win"){
+                $scope.gameState = CONFIG.MY_TURN;
+            }else if(roundData.result == "loss"){
+                $scope.gameState = CONFIG.OPPONENT_TURN;
+            }else if(roundData.id == summonerObj.id){
+                //previous turn was mine and the round was draw.
+                $scope.gameState = CONFIG.MY_TURN;
+            }else{
+                //previous turn was opponents' and the round was draw.
+                $scope.gameState = CONFIG.OPPONENT_TURN;
+            }
+            $scope.round += 1;
+            
+            $scope.checkGameEnd();
         }
     }
 

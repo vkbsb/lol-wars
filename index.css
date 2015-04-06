@@ -55,3 +55,7 @@
           padding: 2px; 
             width: 100%;
         }
+
+.disabledTable{
+    background-color:darkgray;
+}
