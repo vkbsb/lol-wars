@@ -29,7 +29,6 @@ app.controller("SummonerList", [
       }
     }
     
-    // https://euw.api.pvp.net/api/lol/euw/v1.4/summoner/19248048,40267431,44117932,67655352?api_key=4befbf6c-67bf-4d9e-b159-114aed30e108
     var url = "https://euw.api.pvp.net/api/lol/euw/v1.4/summoner/" + summonerList + "?api_key=" + $scope.key;
     $http.get(url).success(function(data){
         $scope.recentSummoners = data;

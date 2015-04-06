@@ -214,6 +214,17 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     $scope.checkGameEnd = function(){
         if($scope.round == 10){
             //this is the end of game now restart the whole thing.
+            $scope.gameState = CONFIG.ENDED;
+            $mdDialog.show(
+                $mdDialog.alert()
+                .title('This is an alert title')
+                .content('You can specify some description text in here.')
+                .ariaLabel('Alert Dialog Demo')
+                .ok('Got it!')
+            ).then(function(){
+                $scope.gameState = CONFIG.NOT_STARTED;
+                $scope.round = 0;
+            });            
         }    
     }
     
@@ -251,7 +262,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
             $scope.gameState = CONFIG.ROUND_RESULT;
             $mdToast.show($mdToast.simple()
-            .content('Round Result: ' + roundData.result)
+            .content('Round Result: ' + roundData.result + (roundData.result =="loss"? ". Opponents' turn now." : ". Your turn again."))
             .position($scope.getToastPosition())
             .hideDelay(2000));
         
@@ -280,15 +291,19 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 }
                 result += ". Opponents' turn again";
             }
-            
+                        
+            if($scope.round <= 9){
             //show toast with current rounds' result.
             $mdToast.show($mdToast.simple()
             .content('Round Result: ' + result)
             .position($scope.getToastPosition())
             .hideDelay(2000));
-            $scope.round += 1;
+            }
             
-            $scope.checkGameEnd();
+            setTimeout(function(){
+                $scope.round += 1;    
+                $scope.checkGameEnd();
+            }, 1500);
             
         }else if($scope.gameState == CONFIG.ROUND_RESULT){
             console.log("Animation Finished, selecting Next Turn.");
