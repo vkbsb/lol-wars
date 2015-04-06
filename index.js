@@ -215,10 +215,40 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
         if($scope.round == 10){
             //this is the end of game now restart the whole thing.
             $scope.gameState = CONFIG.ENDED;
+            var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
+            
+            var myRounds = [];
+            var enemyRounds = [];
+            
+            for(var i = 0; i < $scope.gameData.rounds.length; i++){
+                var roundData = $scope.gameData.rounds[i];
+                if(roundData.hasOwnProperty("id")){
+                    if(roundData.id == summonerObj.id && roundData.result == "win"){
+                        myRounds.push(roundData);
+                    }else if(roundData.result == "win"){ //enemy win rounds.
+                        enemyRounds.push(roundData);
+                    }
+                }    
+            }
+            
+            var resultString = "Game was a Draw";
+            
+            if(enemyRounds.length < myRounds.length){
+                resultString = "You Won the Game!";
+            }else if(enemyRounds.length > myRounds.length){
+                resultString = "You Lost the Game";
+            }
+            
+            if($scope.uw_gameData){
+                console.log("unbinding game data");
+                $scope.uw_gameData();
+                $scope.uw_gameData = null;
+            }
+            
             $mdDialog.show(
                 $mdDialog.alert()
-                .title('This is an alert title')
-                .content('You can specify some description text in here.')
+                .title('Game Ended')
+                .content(resultString)
                 .ariaLabel('Alert Dialog Demo')
                 .ok('Got it!')
             ).then(function(){
