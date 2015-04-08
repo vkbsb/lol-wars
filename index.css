@@ -33,14 +33,26 @@
             //border: solid black 1px;
         -webkit-box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
         -moz-box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
-        box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75);
- 
+        box-shadow: 10px 10px 22px -9px rgba(0,0,0,0.75); 
+        }
+
+        .infoArea {
+            width: 200px;
+            height: 370px;
+            overflow: hidden;
+/*            border: solid black 1px;*/
+            padding: 20px;
+            word-wrap: break-word;
         }
 
         td{ 
             padding: 2px;
             user-select: none;
             -webkit-user-select: none;
+        }
+        
+        tr:hover {
+            background-color: cornflowerblue;
         }
 
         .lowerBetter {

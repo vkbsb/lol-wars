@@ -3,6 +3,7 @@ app.directive('lolMatch', function(){
         "restrict" : "E",
         "templateUrl" : "lol-match/lol-match-template.html",
         "controller" : "CardButtonHandler",
+//        "scope" : {cards:"@"},
         "link" : function(scope, element, attrs){
             //console.log(element);
             //element[0].appendChild(btn);       
@@ -13,10 +14,6 @@ app.directive('lolMatch', function(){
 
 app.controller("CardButtonHandler", ['$scope', 'CONFIG', function($scope, CONFIG){
     $scope.stat_selected = false;
-
-    $scope.time_to_mins = function(value){
-        return Math.round(value / 60);
-    }
     
     $scope.getRoundData = function(stat, cardIndex){
         var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
@@ -30,7 +27,7 @@ app.controller("CardButtonHandler", ['$scope', 'CONFIG', function($scope, CONFIG
         
         console.log("MyCard", myCard);
         console.log("OpponentCard: " + opponentId, opponentCard);
-
+        
         var result = "loss";
                 
         if(CONFIG.CARDINFO.gb.indexOf(stat) > -1){

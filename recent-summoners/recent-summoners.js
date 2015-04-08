@@ -96,6 +96,8 @@ app.controller("SummonerList", [
         obj.$bindTo($scope, "gameData");        
         $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
         
+        //This is to be able to gather info about enemy summoner.
+        $scope.enemy = $scope.recentSummoners[key];
         
         //send message to the opponent to start game.
         var reqRef = new Firebase($scope.firebase_url + key + "/requests" );

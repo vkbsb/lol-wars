@@ -10,9 +10,10 @@
            "OPPONENT_TURN" : 2,
            "ROUND_RESULT" : 3,
            "ENDED" : 4,
+           "ANIM_DURATION" : 4000,
            "CARDINFO": {
-               "gb" : ["k", "a", "wp", "v", "tk"],
-               "lb" : ["time", "d"]
+               "gb" : ["k", "a", "wp", "v", "tk", "time"],
+               "lb" : ["d"]
            }
     });
 
@@ -42,6 +43,9 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     // $scope.champFreq = {};
     // $scope.avgWards = 0;
 //    $scope.hideConfig = false; 
+    $scope.enemy = {};
+    $scope.enemyCard = {};
+        
     $scope.gameState = -1;
     $scope.isRequestShown = false;
     $scope.summoner = "GiZmOfOrEvEr";
@@ -57,6 +61,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     $scope.uw_requests = null;
     $scope.uw_recent = null;
     $scope.uw_gameData = null;
+    $scope.gdUnbindFunc = null;
         
     };
     
@@ -117,6 +122,11 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
         $scope.uw_requests = null;
     }
         
+    if($scope.gdUnbindFunc){
+        $scope.gdUnbindFunc();
+        $scope.gdUnbindFunc = null;
+    }
+        
      $scope.fetching = true;
 
 
@@ -149,29 +159,35 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                     //state is set to -1;
                     if(newvalue[len-1].type == "game_req"){
                         if($scope.gameState == CONFIG.NOT_STARTED){
-                        $scope.showRequest(newvalue[len-1]);
-                        
-                        //Initialize the gameData object with the corresponding game object.
-                        var refUrl = $scope.firebase_url + 
-                                newvalue[len-1].summoner.id + 
-                                "/games/"+ newvalue[len-1].gameTag;                        
-                        var gDataRef = new Firebase(refUrl);
-                        var gDataObj = $firebaseObject(gDataRef);
+                            $scope.showRequest(newvalue[len-1]);
                             
-                        gDataObj.$loaded(function(data){
-                            gDataObj.agreed += 1;
-                            gDataObj[summonerId + "_cards"] = $scope.myCards;
-                            gDataObj.$save();
-                        });
+                            //set the enemyName for display on screen.
+                            $scope.enemy = newvalue[len-1].summoner;
                             
-                        $scope.gameData = gDataObj;
-                        gDataObj.$bindTo($scope, "gameData").then(function(){
-                            $scope.gameState = CONFIG.OPPONENT_TURN;
-                            $scope.round = 0;
-                            $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
-                        });
-                        
-                        
+                            //Initialize the gameData object with the corresponding game object.
+                            var refUrl = $scope.firebase_url + 
+                                    newvalue[len-1].summoner.id + 
+                                    "/games/"+ newvalue[len-1].gameTag;                        
+                            var gDataRef = new Firebase(refUrl);
+                            var gDataObj = $firebaseObject(gDataRef);
+
+                            gDataObj.$loaded(function(data){
+                                //initialize the enemycard value.
+                                $scope.enemyCard = gDataObj[$scope.enemy.id + "_cards"][$scope.round];
+                                
+                                gDataObj.agreed += 1;
+                                gDataObj[summonerId + "_cards"] = $scope.myCards;
+                                gDataObj.$save();
+                            });
+
+                            $scope.gameData = gDataObj;
+                            gDataObj.$bindTo($scope, "gameData").then(function(gdUnbindFunc){
+                                $scope.gdUnbindFunc = gdUnbindFunc;
+                                $scope.gameState = CONFIG.OPPONENT_TURN;
+                                $scope.round = 0;                                   
+                                $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
+                            });
+                                                    
                         //$scope.gameState = 1; //starting the game.
                         }else{
                         //post back a response to the sender that you are not available for game.
@@ -239,10 +255,16 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 resultString = "You Lost the Game";
             }
             
+            //local data watchers unbinding.
             if($scope.uw_gameData){
                 console.log("unbinding game data");
                 $scope.uw_gameData();
                 $scope.uw_gameData = null;
+            }
+            //the firebase bindTo function unbinding.
+            if($scope.gdUnbindFunc){
+                $scope.gdUnbindFunc();
+                $scope.gdUnbindFunc = null;
             }
             
             $mdDialog.show(
@@ -254,6 +276,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             ).then(function(){
                 $scope.gameState = CONFIG.NOT_STARTED;
                 $scope.round = 0;
+                $scope.enemy = {};
+                $scope.enemyCard = {};
             });            
         }    
     }
@@ -272,6 +296,10 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
         $mdDialog.show(confirm);     
     };
     
+    $scope.time_to_mins = function(value){
+        return Math.round(value / 60);
+    }
+    
     $scope.handleGameDataUpdate = function(newval, oldvalue){
         console.log("GameDataUpdate: ", newval);
         if($scope.gameData.agreed != 2){
@@ -287,14 +315,15 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             //we are going to update the game data to send stuff.
             console.log("Enable the clicks on card");
             
-        }else if($scope.gameState == CONFIG.MY_TURN){                        
-            //we set the gameState to ROUND_RESULT so we dont' let the user click on anything else till the card is changed.
+        }else if($scope.gameState == CONFIG.MY_TURN){            
+            //we set the gameState to ROUND_RESULT so we dont' 
+            //let the user click on anything else till the card is changed.
             var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
             $scope.gameState = CONFIG.ROUND_RESULT;
             $mdToast.show($mdToast.simple()
-            .content('Round Result: ' + roundData.result + (roundData.result =="loss"? ". Opponents' turn now." : ". Your turn again."))
+            .content('Round Result: ' + roundData.result)
             .position($scope.getToastPosition())
-            .hideDelay(2000));
+            .hideDelay(CONFIG.ANIM_DURATION));
         
             setTimeout($scope.handleGameDataUpdate, 2000);
         }
@@ -311,7 +340,6 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             var result = "loss";
             if(roundData.result == "loss" && summonerObj.id != roundData.id){
                 console.log("It's my turn now.");
-                $scope.gameState = CONFIG.MY_TURN; 
                 result = "win. Your turn now." ;
             }else{
                 if(roundData.result == "win"){
@@ -321,40 +349,53 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 }
                 result += ". Opponents' turn again";
             }
+            $scope.gameState = CONFIG.MY_TURN; 
+
                         
             if($scope.round <= 9){
-            //show toast with current rounds' result.
-            $mdToast.show($mdToast.simple()
-            .content('Round Result: ' + result)
-            .position($scope.getToastPosition())
-            .hideDelay(2000));
+                //show toast with current rounds' result.
+                $mdToast.show($mdToast.simple()
+                .content('Round Result: ' + roundData.result)
+                .position($scope.getToastPosition())
+                .hideDelay(CONFIG.ANIM_DURATION));                
             }
             
+            //increment the round number after the animation is done.
             setTimeout(function(){
                 $scope.round += 1;    
                 $scope.checkGameEnd();
-            }, 1500);
+                $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
+            }, CONFIG.ANIM_DURATION);
             
         }else if($scope.gameState == CONFIG.ROUND_RESULT){
             console.log("Animation Finished, selecting Next Turn.");
             var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
             var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
             
-            if(roundData.result == "win"){
-                $scope.gameState = CONFIG.MY_TURN;
-            }else if(roundData.result == "loss"){
-                $scope.gameState = CONFIG.OPPONENT_TURN;
-            }else if(roundData.id == summonerObj.id){
-                //previous turn was mine and the round was draw.
-                $scope.gameState = CONFIG.MY_TURN;
-            }else{
+//            if(roundData.result == "win"){
+//                $scope.gameState = CONFIG.MY_TURN;
+//            }else if(roundData.result == "loss"){
+//                $scope.gameState = CONFIG.OPPONENT_TURN;
+//            }else if(roundData.id == summonerObj.id){
+//                //previous turn was mine and the round was draw.
+//                $scope.gameState = CONFIG.MY_TURN;
+//            }else{
+//                //previous turn was opponents' and the round was draw.
+//                $scope.gameState = CONFIG.OPPONENT_TURN;
+//            }
+            
+            if(roundData.id == summonerObj.id){
                 //previous turn was opponents' and the round was draw.
                 $scope.gameState = CONFIG.OPPONENT_TURN;
             }
+            
             $scope.round += 1;
             
             $scope.checkGameEnd();
         }
+        
+        //update the global value so we have the data to show.
+        $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
     }
 
 }]);
