@@ -59,7 +59,7 @@
             background-color: #47D147;
         }
         
-        .opponentSelection{
+        .cardStats, .opponentSelection{
           padding: 2px; 
             width: 100%;
         }

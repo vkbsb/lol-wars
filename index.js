@@ -11,6 +11,8 @@
            "ROUND_RESULT" : 3,
            "ENDED" : 4,
            "ANIM_DURATION" : 4000,
+           "WIN_COLOR" : "#00ff00",
+           "LOSS_COLOR" : "#ff0000",
            "CARDINFO": {
                "gb" : ["k", "a", "wp", "v", "tk", "time"],
                "lb" : ["d"]
@@ -46,6 +48,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     $scope.enemy = {};
     $scope.enemyCard = {};
     $scope.roundResult = "";
+    $scope.roundData = {};
         
     $scope.gameState = -1;
     $scope.isRequestShown = false;
@@ -323,14 +326,20 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             $scope.gameState = CONFIG.ROUND_RESULT;
             
             var result = "";
+            var statColor = CONFIG.WIN_COLOR;
             if(roundData.result == "win"){
-                result = "You Win this round";    
+                result = "You Win this round"; 
             }else if(roundData.result == "loss"){
                 result = $scope.enemy.name + " wins this round";
+                statColor = CONFIG.LOSS_COLOR;
             }else{
-                result = "Round draw";
+                result = "Round draw";                
             }
+            
+//            $scope.roundData = roundData;            
             $scope.roundResult = result;
+            SetColor("myCard_" + $scope.round + "_" + roundData.key, statColor);
+            
 //            $mdToast.show($mdToast.simple()
 //            .content('Round Result: ' + roundData.result)
 //            .position($scope.getToastPosition())
@@ -347,6 +356,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             
             var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
             var result = "";
+            var statColor = CONFIG.WIN_COLOR;
             
             //Check if the last move was mine and based on that decide the string.
             if(summonerObj.id != roundData.id){
@@ -354,6 +364,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                     result = "You win this round." ;
                 }else if(roundData.result == "win"){ 
                     result = $scope.enemy.name + " wins this round" ;
+                    statColor = CONFIG.LOSS_COLOR;
                 }else{
                     result = "Round draw" ;
                 }
@@ -368,16 +379,20 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //                .content('Round Result: ' + result)
 //                .position($scope.getToastPosition())
 //                .hideDelay(CONFIG.ANIM_DURATION)); 
+//                $scope.roundData = roundData;
                 $scope.roundResult = result;
-            }
+            }            
+            SetColor("myCard_" + $scope.round + "_" + roundData.key, statColor);
             
             //increment the round number after the animation is done.
             setTimeout(function(){
+                ResetColor("myCard_" + $scope.round + "_" + roundData.key);
                 $scope.round += 1;    
                 $scope.checkGameEnd();
                 $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
                 $scope.gameState = CONFIG.MY_TURN; 
                 $scope.roundResult = "";
+//                $scope.roundData = {};
             }, CONFIG.ANIM_DURATION);
             
         }else if($scope.gameState == CONFIG.ROUND_RESULT){
@@ -393,11 +408,14 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //                $scope.gameState = CONFIG.MY_TURN;
 //            }
             
+            ResetColor("myCard_" + $scope.round + "_" + roundData.key);
+            
             $scope.round += 1;
             
             $scope.checkGameEnd();
             
             $scope.roundResult = "";
+//            $scope.roundData = {};
         }
         //update the global value so we have the data to show.
         $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];    
