@@ -1,16 +1,53 @@
 
-            <div class="card" ng-show="round == $index"> 
-               <center> 
-                   <img ng-src="http://lkimg.zamimg.com/shared/riot/images/champions/{{card.ch}}.png"> </img> 
-                    <br> {{round+1}} / 10
-                </center>
-               <div class="row heading">  {{ champData.keys[card.ch] }}  </div>
+<div class="card" ng-show="round == $index"> 
+   <center> 
+       <img ng-src="http://lkimg.zamimg.com/shared/riot/images/champions/{{card.ch}}.png"> </img> 
+    </center>
+   <div class="row heading">  {{ champData.keys[card.ch] }}  </div>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('v', $index)" 
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Result </div>
+    <div> {{ card.v? "Victory" : "Defeat" }} </div>
+    </md-button>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('k', $index)" 
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Kills </div>
+    <div> {{card.k}} </div>
+    </md-button>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('d', $index)" 
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Deaths </div>
+    <div> {{card.d}} </div>
+    </md-button>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('a', $index)"
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Assists </div>
+    <div> {{card.a}} </div>
+    </md-button>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('tk', $index)" 
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Turrents </div>
+    <div> {{card.tk}} </div>
+    </md-button>
+
+    <md-button class="opponentSelection" ng-click="stat_clicked('tk', $index)" 
+               ng-disabled="gameState == 2 || gameState == 3">
+    <div style="float:left;width:50%;text-align:left;"> Duration </div>
+    <div> {{time_to_mins(card.time)}} Mins </div>
+    </md-button>
+
+<!--
                <table width="100%">
                 <tr ng-click="stat_clicked('v', $index)">
                     <td> Result </td> <td>{{ card.v? "Victory" : "Defeat" }}</td> 
                 </tr>
                 <tr ng-click="stat_clicked('k', $index)">
-                    <td> Kills </td> <td>{{card.k}}</td> 
+                    <td> Kills </td> <td></td> 
                 </tr>
                 <tr ng-click="stat_clicked('d', $index)">
                     <td> Deaths </td> <td>{{card.d}}</td> 
@@ -18,11 +55,9 @@
                 <tr ng-click="stat_clicked('a', $index)">
                     <td> Assists </td> <td>{{card.a}}</td> 
                 </tr>
-<!--
                 <tr ng-click="stat_clicked('wp', $index)">
                     <td> Wards Placed </td> <td>{{card.wp}}</td> 
                 </tr>
--->
                 <tr ng-click="stat_clicked('tk', $index)">
                     <td> Turrets </td> <td>{{card.tk}}</td> 
                 </tr>
@@ -30,4 +65,5 @@
                     <td> Duration </td> <td>{{time_to_mins(card.time)}} Mins</td> 
                 </tr>
                </table>
-            </div>
+-->
+</div>

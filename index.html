@@ -22,13 +22,15 @@
     
     <link rel="stylesheet" type="text/css" href="index.css"> </link>
 </head>
-<body ng-app="MyTest">    
+<body ng-app="MyTest">        
     <div ng-controller="TestController" layout="row">
         
         <!-- Your card List -->
         <div layout="column" layout-align="center center">
             {{summoner}}
         <div class="cardwindow">
+            
+<!--        Summoner selection list-->
         <div class="card" ng-hide="gameState > -1">
               <md-input-container>
                   <label>Summoner Name</label>
@@ -40,11 +42,7 @@
             
             <md-button ng-click="fetch_summonerInfo()" class="md-primary opponentSelection">Fetch List</md-button>
         </div>
-        
-        <div class="card" ng-hide="gameState > 0">
-            Waiting for your partner.
-        </div>
-
+                
         <div ng-repeat="card in myCards track by $index" ng-class="{'disabledTable':gameState==2}">
             <lol-match> </lol-match>
         </div>
@@ -53,46 +51,72 @@
         
         <!-- This is the Text Area Div -->
         <div class="infoArea" layout="column">
-            <div flex="30"></div>
+            <div flex="30">
+                <div ng-show="gameState > 0" style="text-align:center; font-weight:bold; width:100%;">
+                    Round: {{round+1}} / 10 
+                </div>
+            </div>
             <div flex="70">
-                This is the message from game.. how do you handle this?
+                <span ng-show="gameState == 0">
+                    Waiting for your partner.
+                </span>
+                <span ng-show="gameState == 1">
+                    Your turn
+                </span>
+                
+                <span ng-show="gameState == 2">
+                    {{enemy.name}}'s turn
+                </span>
+                <br>
+                <span>
+                    {{roundResult}}
+                </span>
+                
             </div>            
         </div>
         
         <!-- opponent Area -->
-        <div layout="column">
+        <div layout="column" layout-align="center center">
             {{enemy.name}}
         <!-- gameState == CONFIG.ROUND_RESULT then show the card and do animation of the stat etc.-->
-        <div class="cardwindow" ng-show="gameState == 3 || gameState == 2">
+        <div class="cardwindow" ng-show="gameState > -1">
             <!-- enemy card details shown during the result phase -->
-            <div class="card"> 
+            <div class="card" ng-show="gameState == 3 || gameState == 2"> 
                <center> 
                    <img ng-src="http://lkimg.zamimg.com/shared/riot/images/champions/{{enemyCard.ch}}.png"> </img> 
-                    <br> {{round+1}} / 10
                 </center>
                <div class="row heading">  {{ champData.keys[enemyCard.ch] }}  </div>
-               <table width="100%">
-                <tr>
-                    <td> Result </td> <td>{{ enemyCard.v? "Victory" : "Defeat" }}</td> 
-                </tr>
-                <tr>
-                    <td> Kills </td> <td>{{enemyCard.k}}</td> 
-                </tr>
-                <tr>
-                    <td> Deaths </td> <td>{{enemyCard.d}}</td> 
-                </tr>
-                <tr>
-                    <td> Assists </td> <td>{{enemyCard.a}}</td> 
-                </tr>
-                <tr>
-                    <td> Turrets </td> <td>{{enemyCard.tk}}</td> 
-                </tr>
-                <tr>
-                    <td> Duration </td> <td>{{time_to_mins(enemyCard.time)}} Mins</td> 
-                </tr>
-               </table>
+            
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Result </div>
+                <div> {{ enemyCard.v? "Victory" : "Defeat" }} </div>
+                </md-button>
+
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Kills </div>
+                <div> {{enemyCard.k}} </div>
+                </md-button>
+
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Deaths </div>
+                <div> {{enemyCard.d}} </div>
+                </md-button>
+
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Assists </div>
+                <div> {{enemyCard.a}} </div>
+                </md-button>
+
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Turrents </div>
+                <div> {{enemyCard.tk}} </div>
+                </md-button>
+
+                <md-button class="opponentSelection" ng-disabled="true">
+                <div style="float:left;width:50%;text-align:left;"> Duration </div>
+                <div> {{time_to_mins(enemyCard.time)}} Mins </div>
+                </md-button>
             </div> <!-- end of enemy card details -->
-            {{enemyCard}}
         </div>
         </div>
         

@@ -45,6 +45,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //    $scope.hideConfig = false; 
     $scope.enemy = {};
     $scope.enemyCard = {};
+    $scope.roundResult = "";
         
     $scope.gameState = -1;
     $scope.isRequestShown = false;
@@ -320,11 +321,20 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             //let the user click on anything else till the card is changed.
             var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
             $scope.gameState = CONFIG.ROUND_RESULT;
-            $mdToast.show($mdToast.simple()
-            .content('Round Result: ' + roundData.result)
-            .position($scope.getToastPosition())
-            .hideDelay(CONFIG.ANIM_DURATION));
-        
+            
+            var result = "";
+            if(roundData.result == "win"){
+                result = "You Win this round";    
+            }else if(roundData.result == "loss"){
+                result = $scope.enemy.name + " wins this round";
+            }else{
+                result = "Round draw";
+            }
+            $scope.roundResult = result;
+//            $mdToast.show($mdToast.simple()
+//            .content('Round Result: ' + roundData.result)
+//            .position($scope.getToastPosition())
+//            .hideDelay(CONFIG.ANIM_DURATION));
             setTimeout($scope.handleGameDataUpdate, 2000);
         }
         else if($scope.gameState == CONFIG.OPPONENT_TURN){
@@ -336,28 +346,29 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             }
             
             var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
-            //if i didn't amke the last move and the result was loss then next turn is mine.
-            var result = "loss";
-            if(roundData.result == "loss" && summonerObj.id != roundData.id){
-                console.log("It's my turn now.");
-                result = "win. Your turn now." ;
-            }else{
-                if(roundData.result == "win"){
-                    result = "loss";    
+            var result = "";
+            
+            //Check if the last move was mine and based on that decide the string.
+            if(summonerObj.id != roundData.id){
+                if(roundData.result == "loss"){
+                    result = "You win this round." ;
+                }else if(roundData.result == "win"){ 
+                    result = $scope.enemy.name + " wins this round" ;
                 }else{
-                    result = roundData.result;
+                    result = "Round draw" ;
                 }
-                result += ". Opponents' turn again";
             }
-            $scope.gameState = CONFIG.MY_TURN; 
-
-                        
+            
+            //checking why the result is not shown.. 
+//            $scope.gameState = CONFIG.ROUND_RESULT;
+            
             if($scope.round <= 9){
-                //show toast with current rounds' result.
-                $mdToast.show($mdToast.simple()
-                .content('Round Result: ' + roundData.result)
-                .position($scope.getToastPosition())
-                .hideDelay(CONFIG.ANIM_DURATION));                
+//                //show toast with current rounds' result.
+//                $mdToast.show($mdToast.simple()
+//                .content('Round Result: ' + result)
+//                .position($scope.getToastPosition())
+//                .hideDelay(CONFIG.ANIM_DURATION)); 
+                $scope.roundResult = result;
             }
             
             //increment the round number after the animation is done.
@@ -365,6 +376,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 $scope.round += 1;    
                 $scope.checkGameEnd();
                 $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
+                $scope.gameState = CONFIG.MY_TURN; 
+                $scope.roundResult = "";
             }, CONFIG.ANIM_DURATION);
             
         }else if($scope.gameState == CONFIG.ROUND_RESULT){
@@ -372,30 +385,22 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             var roundData = $scope.gameData.rounds[$scope.gameData.rounds.length-1];
             var summonerObj = $scope.summonerInfo[$scope.summoner.toLowerCase()];
             
-//            if(roundData.result == "win"){
-//                $scope.gameState = CONFIG.MY_TURN;
-//            }else if(roundData.result == "loss"){
-//                $scope.gameState = CONFIG.OPPONENT_TURN;
-//            }else if(roundData.id == summonerObj.id){
-//                //previous turn was mine and the round was draw.
-//                $scope.gameState = CONFIG.MY_TURN;
-//            }else{
-//                //previous turn was opponents' and the round was draw.
-//                $scope.gameState = CONFIG.OPPONENT_TURN;
-//            }
-            
             if(roundData.id == summonerObj.id){
                 //previous turn was opponents' and the round was draw.
                 $scope.gameState = CONFIG.OPPONENT_TURN;
             }
+//            else{
+//                $scope.gameState = CONFIG.MY_TURN;
+//            }
             
             $scope.round += 1;
             
             $scope.checkGameEnd();
+            
+            $scope.roundResult = "";
         }
-        
         //update the global value so we have the data to show.
-        $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
+        $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];    
     }
 
 }]);

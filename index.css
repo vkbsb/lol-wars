@@ -1,5 +1,5 @@
     .card {
-        width: 95%;
+/*        width: 95%;*/
         height: 100%;
         margin: 3px;
         //border: 1px solid black;
@@ -41,7 +41,7 @@
             height: 370px;
             overflow: hidden;
 /*            border: solid black 1px;*/
-            padding: 20px;
+            padding-left: 20px;
             word-wrap: break-word;
         }
 
@@ -49,10 +49,6 @@
             padding: 2px;
             user-select: none;
             -webkit-user-select: none;
-        }
-        
-        tr:hover {
-            background-color: cornflowerblue;
         }
 
         .lowerBetter {
