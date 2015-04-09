@@ -58,6 +58,7 @@ app.controller("SummonerList", [
     
     $scope.updateMyCards = function(){
         $scope.myCards = [];
+        var cardsArray = [];
         for(var i = 0; i < $scope.recent.games.length; i++){
             var card = {};
             var stats = $scope.recent.games[i].stats;
@@ -70,7 +71,13 @@ app.controller("SummonerList", [
             card["tk"] = stats.turretsKilled? stats.turretsKilled : 0; //turrets destroyed.
             card["time"] = stats.timePlayed; //match duration.
             
-            $scope.myCards.push(card);
+            cardsArray.push(card);
+        }
+        
+//        console.log(cardsArray);
+        while(cardsArray.length > 0){
+            var randIndex = Math.random() * cardsArray.length;
+            $scope.myCards.push(cardsArray.splice(randIndex, 1)[0])
         }
         console.log($scope.myCards);
     };
