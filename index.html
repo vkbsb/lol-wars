@@ -34,24 +34,27 @@
     <link rel="stylesheet" type="text/css" href="index.css"> </link>
 </head>
 <body ng-app="MyTest">        
-    <div ng-controller="TestController" layout="row">
+    <div ng-controller="TestController" layout="row" layout-padding>
         
         <!-- Your card List -->
         <div layout="column" layout-align="center center">
-            {{summoner}}
+            <h3 class="md-title"> {{summonerInfo[summoner.toLowerCase()].name}} </h3>
         <div class="cardwindow">
             
 <!--        Summoner selection list-->
         <div class="card" ng-hide="gameState > -1">
               <md-input-container>
-                  <label>Summoner Name</label>
-                  <input  placeholder="Yours" ng-model="summoner">
-              </md-input-container>
-
+                <label>Summoner Name</label>
+                <input  placeholder="Yours" ng-model="summoner">
+              </md-input-container>                                    
             <!-- show recent summoners you played against -->
             <recent-summoners></recent-summoners>
             
-            <md-button ng-click="fetch_summonerInfo()" class="md-primary opponentSelection">Fetch List</md-button>
+            <md-select placeholder="Pick" ng-model="region">
+                    <md-option value="euw">EUW</md-option>
+                    <md-option value="na">NA</md-option>
+            </md-select>
+            <md-button ng-click="fetch_summonerInfo()" class="md-primary md-raised">Fetch List</md-button>
         </div>
                 
         <div ng-repeat="card in myCards track by $index">
@@ -61,23 +64,23 @@
         </div> <!-- left part end -->
         
         <!-- This is the Text Area Div -->
-        <div class="infoArea" layout="column">
-            <div flex="30">
+        <div class="infoArea" layout="column" layout-align="top center">           
+            <h3 class="md-display-1" ng-show="gameState > 0"> Round: {{round+1}}/10 </h3>
+            <div>
+<!--
                 <div ng-show="gameState > 0" style="text-align:center; font-weight:bold; width:100%;">
-                    Round: {{round+1}} / 10 
                 </div>
+-->
             </div>
-            <div flex="70">
+            <div style="width:100%;">
                 <span ng-show="gameState == 0">
                     Waiting for your partner.
                 </span>
-                <span ng-show="gameState == 1">
-                    Your turn
-                </span>
-                
-                <span ng-show="gameState == 2">
-                    {{enemy.name}}'s turn
-                </span>
+                <div ng-show="gameState == 1" layout="column" layout-align="center start">
+                    <span style="float:left; width:100%;"> Your turn</span>
+                    <span ng-show="gameState == 2">{{enemy.name}}'s turn</span>
+                    <img src="imgs/bluearrow.png" style="float:left;"></img>
+                </div>
                 <br>
                 <span>
                     {{roundResult}}
@@ -87,7 +90,7 @@
         
         <!-- opponent Area -->
         <div layout="column" layout-align="center center">
-            {{enemy.name}}
+            <h3 class="md-title">{{enemy.name}}</h3>
         <!-- gameState == CONFIG.ROUND_RESULT then show the card and do animation of the stat etc.-->
         <div class="cardwindow" ng-show="gameState > -1">
             <!-- enemy card details shown during the result phase -->

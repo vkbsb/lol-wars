@@ -10,7 +10,7 @@
            "OPPONENT_TURN" : 2,
            "ROUND_RESULT" : 3,
            "ENDED" : 4,
-           "ANIM_DURATION" : 4000,
+           "ANIM_DURATION" : 2000,
            "WIN_COLOR" : "#00ff00",
            "LOSS_COLOR" : "#ff0000",
            "CARDINFO": {
@@ -24,27 +24,30 @@ app.controller('TestController', [
 'CONFIG', '$mdToast', '$animate', 
 function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdToast, $animate){
 
+    $scope.$watch("region", function(newval, oldval){
+        console.log("Region: " + newval);
+        var RIOT_API = "https://" + newval + ".api.pvp.net";
+        $scope.SUMMONER_BY_NAME = RIOT_API+"/api/lol/" + newval + "/v1.4/summoner/by-name/"; //{summonerNames};
+        $scope.SUMMONER_BY_ID = RIOT_API+"/api/lol/"+ newval + "/v1.4/summoner/"; //{summonerIds};
+        $scope.SUMMONER_RECENT_GAMES = RIOT_API+"/api/lol/"+ newval + "/v1.3/game/by-summoner/";  //{summonerId}/recent      
+    });
+    
     base_path = 'https://euw.api.pvp.net/api/lol/euw/v1.4/'; 
     
     $scope.init = function() {
       
     //initialize the firebase data store.
-    $scope.firebase_url = "https://lol-wars.firebaseio.com/";
-    // // var lolWarsRef = new Firebase($scope.firebase_url);
-    // // $scope.lolWars = $firebaseObject(lolWarsRef);
-    // $scope.lolWars = new Firebase($scope.firebase_url);
-    
+    $scope.firebase_url = "https://lol-wars.firebaseio.com/";    
     $scope.key = '4befbf6c-67bf-4d9e-b159-114aed30e108';
+        
+    $scope.region = "euw";
     $scope.summonerInfo = "";
-    // $scope.summoner = "Summoner Name";
     $scope.fetching = false;
     $scope.forceRefresh = false;
     $scope.recent = {};
     $scope.gameData = {};
     $scope.myCards = [];
-    // $scope.champFreq = {};
-    // $scope.avgWards = 0;
-//    $scope.hideConfig = false; 
+
     $scope.enemy = {};
     $scope.enemyCard = {};
     $scope.roundResult = "";
@@ -52,7 +55,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
         
     $scope.gameState = -1;
     $scope.isRequestShown = false;
-    $scope.summoner = "GiZmOfOrEvEr";
+    $scope.summoner = "";
     $scope.round = 0;
     $scope.toastPosition = {
     bottom: false,
@@ -134,7 +137,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
      $scope.fetching = true;
 
 
-     $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key)
+//     $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key)
+     $http.get($scope.SUMMONER_BY_NAME + $scope.summoner + '?api_key=' + $scope.key)
          .success(function(data) {
          $scope.fetching = false; 
          $scope.true = 0;
@@ -220,8 +224,9 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
          $scope.requests = obj;         
          
         //https://euw.api.pvp.net/api/lol/euw/v1.3/game/by-summoner/19248048/recent?api_key=4befbf6c-67bf-4d9e-b159-114aed30e108
-        $http.get("https://euw.api.pvp.net/api/lol/euw/v1.3/game/by-summoner/" + 
-            summonerId + "/recent?api_key=" + $scope.key).success(function(recent){
+//        $http.get("https://euw.api.pvp.net/api/lol/euw/v1.3/game/by-summoner/"
+        $http.get($scope.SUMMONER_RECENT_GAMES + summonerId + "/recent?api_key=" + $scope.key)
+            .success(function(recent){
                 localStorage["recent"] = JSON.stringify(recent);
                 $scope.recent = recent;
             });
@@ -344,7 +349,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //            .content('Round Result: ' + roundData.result)
 //            .position($scope.getToastPosition())
 //            .hideDelay(CONFIG.ANIM_DURATION));
-            setTimeout($scope.handleGameDataUpdate, 2000);
+            setTimeout($scope.handleGameDataUpdate, CONFIG.ANIM_DURATION);
         }
         else if($scope.gameState == CONFIG.OPPONENT_TURN){
             //we have to wait for the other user's move 
