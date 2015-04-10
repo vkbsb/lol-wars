@@ -64,25 +64,28 @@
         </div> <!-- left part end -->
         
         <!-- This is the Text Area Div -->
-        <div class="infoArea" layout="column" layout-align="top center">           
-            <h3 class="md-display-1" ng-show="gameState > 0"> Round: {{round+1}}/10 </h3>
+        <div class="infoArea" layout="column">           
+            <h3 class="md-display-1 alignCenter" ng-show="gameState > 0"> Round: {{round+1}}/10 </h3>
             <div>
 <!--
                 <div ng-show="gameState > 0" style="text-align:center; font-weight:bold; width:100%;">
                 </div>
 -->
             </div>
-            <div style="width:100%;">
+            <div style="width:100%;position:relative;">
                 <span ng-show="gameState == 0">
                     Waiting for your partner.
                 </span>
-                <div ng-show="gameState == 1" layout="column" layout-align="center start">
-                    <span style="float:left; width:100%;"> Your turn</span>
-                    <span ng-show="gameState == 2">{{enemy.name}}'s turn</span>
-                    <img src="imgs/bluearrow.png" style="float:left;"></img>
+                
+                <div class="turnIndicator"> 
+                    <span  ng-show="gameState == 1" style="float:left; width:100%;"> Your turn</span>
+                    <span  ng-show="gameState == 2" style="float:right;">Opponent's turn</span>
+                    
+                    <img src="imgs/bluearrow.png" ng-show="gameState > 0"
+                        ng-class="{leftArrow:gameState == 1, rightArrow:gameState == 2}"></img>
                 </div>
-                <br>
-                <span>
+            
+                <span class="alignCenter">
                     {{roundResult}}
                 </span>                
             </div>            
