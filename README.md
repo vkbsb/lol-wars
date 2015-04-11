@@ -34,3 +34,6 @@ You can play the game now: [Play Now](https://lol-wars.firebaseapp.com/)
 #The Target
 We would like to add a bunch of features like challenging friends, leaderboards and ranked games etc. Here is a wireframe that we made demonstrating that vision:
 [LoL-Wars Vision](https://github.com/vkbsb/lol-wars/raw/master/docs/lol-wars.swf)
+
+#Security
+The current implementation is a proof of concept and assumes that there is no malicious behavior from the users' part. For starters we dont' have login authentication for using the summoner names. If a summoner name is already in use, if somebody else starts using the same summoner name for playing the game, the game will behave in unexpected manner. Secondly we are using firebase store without any authentication which leads to possibility that users' can manipulate games if they access/modify the game's data store.
