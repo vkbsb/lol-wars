@@ -11,8 +11,8 @@
            "ROUND_RESULT" : 3,
            "ENDED" : 4,
            "ANIM_DURATION" : 2000,
-           "WIN_COLOR" : "#00ff00",
-           "LOSS_COLOR" : "#ff0000",
+           "WIN_COLOR" : "#669900",
+           "LOSS_COLOR" : "#d63c3c",
            "CARDINFO": {
                "gb" : ["k", "a", "wp", "v", "tk", "time"],
                "lb" : ["d"]
@@ -57,6 +57,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     $scope.isRequestShown = false;
     $scope.summoner = "";
     $scope.round = 0;
+    $scope.myRounds = [-2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     $scope.toastPosition = {
     bottom: false,
     top: true,
@@ -192,7 +193,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                             gDataObj.$bindTo($scope, "gameData").then(function(gdUnbindFunc){
                                 $scope.gdUnbindFunc = gdUnbindFunc;
                                 $scope.gameState = CONFIG.OPPONENT_TURN;
-                                $scope.round = 0;                                   
+                                $scope.round = 0;
+                                $scope.myRounds = [-2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                                 $scope.uw_gameData = $scope.$watch("gameData", $scope.handleGameDataUpdate);
                             });
                                                     
@@ -285,6 +287,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             ).then(function(){
                 $scope.gameState = CONFIG.NOT_STARTED;
                 $scope.round = 0;
+                $scope.myRounds = [-2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 $scope.enemy = {};
                 $scope.enemyCard = {};
             });            
@@ -334,16 +337,19 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             var statColor = CONFIG.WIN_COLOR;
             if(roundData.result == "win"){
                 result = "You Win this round."; 
+                $scope.myRounds[$scope.round] = 1;
             }else if(roundData.result == "loss"){
 //                result = $scope.enemy.name + " wins this round";
                 result = "You lost this round."
+                $scope.myRounds[$scope.round] = -1;
                 statColor = CONFIG.LOSS_COLOR;
             }else{
-                result = "Round draw";                
+                result = "Round draw";    
+                $scope.myRounds[$scope.round] = 0;
             }
             
 //            $scope.roundData = roundData;            
-            $scope.roundResult = result;
+            $scope.roundResult = result;            
             SetColor("myCard_" + $scope.round + "_" + roundData.key, statColor);
             
 //            $mdToast.show($mdToast.simple()
@@ -368,12 +374,15 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             if(summonerObj.id != roundData.id){
                 if(roundData.result == "loss"){
                     result = "You win this round." ;
+                    $scope.myRounds[$scope.round] = 1;
                 }else if(roundData.result == "win"){ 
 //                    result = $scope.enemy.name + " wins this round" ;
                     result = "You lost this round."
+                    $scope.myRounds[$scope.round] = -1;
                     statColor = CONFIG.LOSS_COLOR;
                 }else{
                     result = "Round draw" ;
+                    $scope.myRounds[$scope.round] = 0;
                 }
             }
             
@@ -394,7 +403,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             //increment the round number after the animation is done.
             setTimeout(function(){
                 ResetColor("myCard_" + $scope.round + "_" + roundData.key);
-                $scope.round += 1;    
+                $scope.round += 1;  
+                $scope.myRounds[$scope.round] = -2;
                 $scope.checkGameEnd();
                 $scope.enemyCard = $scope.gameData[$scope.enemy.id+"_cards"][$scope.round];
                 $scope.gameState = CONFIG.MY_TURN; 
@@ -418,6 +428,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             
             $scope.round += 1;
             
+            $scope.myRounds[$scope.round] = -2;
             $scope.checkGameEnd();
             
             $scope.roundResult = "";

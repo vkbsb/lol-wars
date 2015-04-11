@@ -66,12 +66,13 @@
         <!-- This is the Text Area Div -->
         <div class="infoArea" layout="column">           
             <h3 class="md-display-1 alignCenter" ng-show="gameState > 0"> Round: {{round+1}}/10 </h3>
-            <div>
-<!--
-                <div ng-show="gameState > 0" style="text-align:center; font-weight:bold; width:100%;">
+            
+            <div layout="row" layout-align="space-around center" width="100%;" ng-show="gameState > 0">
+                <div ng-repeat="r in myRounds track by $index" 
+                     ng-class="{circle:r == 0, redCircle:r == -1, greenCircle: r == 1, blueCircle:r == -2}"> 
                 </div>
--->
             </div>
+            
             <div style="width:100%;">
                 <span ng-show="gameState == 0">
                     Waiting for your partner.
@@ -79,16 +80,15 @@
                             
                 <h3 class="alignCenter md-display-2">
                     &nbsp; {{roundResult}}
-                </h3>     
-                
+                </h3>                     
                 
                 <div class="turnIndicator"> 
-                    <span  ng-show="gameState == 1 || gameState == 3" style="float:left; width:100%;"> Your turn</span>
+                    <span  ng-show="gameState == 1 || gameState == 3" 
+                          style="float:left; width:100%;"> Your turn</span>
                     <span  ng-show="gameState == 2" style="float:right;">Opponent's turn</span>
                     
                     <img src="imgs/bluearrow.png" ng-show="gameState > 0"
-                        ng-class="{leftArrow:gameState == 1, rightArrow:gameState == 2}"></img>
-        
+                        ng-class="{leftArrow:gameState == 1, rightArrow:gameState == 2}"></img>        
                 </div>           
             </div> 
 <!--        <md-progress-circular ng-show="gameState==2" md-mode="indeterminate"></md-progress-circular>-->

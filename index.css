@@ -20,10 +20,10 @@
         }
 
         .win { 
-            background-color: #00ff00;
+            background-color: #669900;
         }
         .loss { 
-            background-color: #ff0000;
+            background-color: #d63c3c;
         }
 
         .cardwindow { 
@@ -98,4 +98,23 @@ img {
 .alignCenter {
     width: 100%;
     text-align: center;
+}
+
+.circle, .redCircle, .greenCircle, .blueCircle { 
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #b1b1b1;
+}
+
+.redCircle { 
+    background-color: #d63c3c;
+}
+
+.greenCircle {
+    background-color: #669900;
+}
+
+.blueCircle {
+    background-color: #33b5e5;
 }
