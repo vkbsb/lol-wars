@@ -333,9 +333,10 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             var result = "";
             var statColor = CONFIG.WIN_COLOR;
             if(roundData.result == "win"){
-                result = "You Win this round"; 
+                result = "You Win this round."; 
             }else if(roundData.result == "loss"){
-                result = $scope.enemy.name + " wins this round";
+//                result = $scope.enemy.name + " wins this round";
+                result = "You lost this round."
                 statColor = CONFIG.LOSS_COLOR;
             }else{
                 result = "Round draw";                
@@ -368,7 +369,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 if(roundData.result == "loss"){
                     result = "You win this round." ;
                 }else if(roundData.result == "win"){ 
-                    result = $scope.enemy.name + " wins this round" ;
+//                    result = $scope.enemy.name + " wins this round" ;
+                    result = "You lost this round."
                     statColor = CONFIG.LOSS_COLOR;
                 }else{
                     result = "Round draw" ;
@@ -411,8 +413,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             }
 //            else{
 //                $scope.gameState = CONFIG.MY_TURN;
-//            }
-            
+//            }            
             ResetColor("myCard_" + $scope.round + "_" + roundData.key);
             
             $scope.round += 1;

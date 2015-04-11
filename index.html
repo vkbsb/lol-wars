@@ -72,23 +72,26 @@
                 </div>
 -->
             </div>
-            <div style="width:100%;position:relative;">
+            <div style="width:100%;">
                 <span ng-show="gameState == 0">
                     Waiting for your partner.
                 </span>
+                            
+                <h3 class="alignCenter md-display-2">
+                    &nbsp; {{roundResult}}
+                </h3>     
+                
                 
                 <div class="turnIndicator"> 
-                    <span  ng-show="gameState == 1" style="float:left; width:100%;"> Your turn</span>
+                    <span  ng-show="gameState == 1 || gameState == 3" style="float:left; width:100%;"> Your turn</span>
                     <span  ng-show="gameState == 2" style="float:right;">Opponent's turn</span>
                     
                     <img src="imgs/bluearrow.png" ng-show="gameState > 0"
                         ng-class="{leftArrow:gameState == 1, rightArrow:gameState == 2}"></img>
-                </div>
-            
-                <span class="alignCenter">
-                    {{roundResult}}
-                </span>                
-            </div>            
+        
+                </div>           
+            </div> 
+<!--        <md-progress-circular ng-show="gameState==2" md-mode="indeterminate"></md-progress-circular>-->
         </div>
         
         <!-- opponent Area -->
@@ -138,6 +141,7 @@
                 <div style="float:left;width:50%;text-align:left;"> Duration </div>
                 <div> {{time_to_mins(enemyCard.time)}} Mins </div>
                 </md-button>
+                <md-progress-linear style="position:relative;" ng-show="gameState == 2" md-mode="indeterminate"></md-progress-linear>
             </div> <!-- end of enemy card details -->
         </div>
         </div>
