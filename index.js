@@ -250,11 +250,19 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
             for(var i = 0; i < $scope.gameData.rounds.length; i++){
                 var roundData = $scope.gameData.rounds[i];
                 if(roundData.hasOwnProperty("id")){
-                    if(roundData.id == summonerObj.id && roundData.result == "win"){
-                        myRounds.push(roundData);
-                    }else if(roundData.result == "win"){ //enemy win rounds.
-                        enemyRounds.push(roundData);
-                    }
+                    if(roundData.id == summonerObj.id){
+                        if(roundData.result == "win"){
+                            myRounds.push(roundData);    
+                        }else if(roundData.result == "loss"){
+                            enemyRounds.push(roundData);    
+                        }                        
+                    }else{
+                        if(roundData.result == "win"){ //enemy win rounds.
+                            enemyRounds.push(roundData);
+                        }else if(roundData.result == "loss"){//enemy loss rounds.
+                            myRounds.push(roundData);
+                        }                        
+                    } 
                 }    
             }
             
@@ -290,6 +298,15 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 $scope.myRounds = [-2, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                 $scope.enemy = {};
                 $scope.enemyCard = {};
+                
+                //shuffle the cards for the next game.
+                var len = $scope.myCards.length;
+                for(var i = 0; i < $scope.myCards.length; i++){
+                    var rindex = Math.floor(len * Math.random());
+                    var temp = $scope.myCards[rindex];
+                    $scope.myCards[rindex] = $scope.myCards[i];
+                    $scope.myCards[i] = temp;                    
+                }
             });            
         }    
     }
