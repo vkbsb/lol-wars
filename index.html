@@ -50,11 +50,13 @@
             <!-- show recent summoners you played against -->
             <recent-summoners></recent-summoners>
             
+            <div layout="row" layout-align="center end">
             <md-select placeholder="Pick" ng-model="region">
                     <md-option value="euw">EUW</md-option>
                     <md-option value="na">NA</md-option>
             </md-select>
             <md-button ng-click="fetch_summonerInfo()" class="md-primary md-raised">Fetch List</md-button>
+            </div>
         </div>
                 
         <div ng-repeat="card in myCards track by $index">
