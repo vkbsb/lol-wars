@@ -16,6 +16,7 @@ app.controller("SummonerList", [
     if(typeof($scope.recent.games) == "undefined"){
         return;
     }
+      
     //update the cards that we have for this game.
     $scope.updateMyCards();
       
