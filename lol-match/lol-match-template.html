@@ -22,7 +22,10 @@
     <md-button id="{{'myCard_' + $index + '_d'}}"
                class="cardStats" ng-click="stat_clicked('d', $index)" 
                ng-disabled="gameState == 2 || gameState == 3">
-    <div style="float:left;width:50%;text-align:left;"> Deaths </div>
+    <div style="float:left;width:50%;text-align:left;">
+        Deaths 
+         <img style="  height: 3%;width: auto;" src="imgs/redarrow.png"></img>
+    </div>
     <div> {{card.d}} </div>
     </md-button>
 
