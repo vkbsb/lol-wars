@@ -28,6 +28,9 @@ Each card corresponds to one of the last 10 matches you have played in League Of
 Since the cards are made of last 10 games in random order, we have 10 rounds where each player gets to choose a stat on the card in alternate rounds. If the players' stat is better than the opponents' stat the player wins the round else the opponent wins the round. After all the 10 rounds, the player with higher number of round victories wins the game.
 
 You can play the game now: [Play Now](https://lol-wars.firebaseapp.com/)
+
+Watch the Gameplay Video: [Watch Now](https://youtu.be/AiOPGpqcuwc)
+
 ###Note:
 * Player disconnects/timeouts during game are not handled.
 * In future we want to separate the cards based on the mode played.
