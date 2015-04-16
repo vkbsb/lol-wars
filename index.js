@@ -13,6 +13,7 @@
            "ANIM_DURATION" : 2000,
            "WIN_COLOR" : "#669900",
            "LOSS_COLOR" : "#d63c3c",
+           "HL_COLOR" : "#33b5e5",
            "CARDINFO": {
                "gb" : ["k", "a", "wp", "v", "tk", "time"],
                "lb" : ["d"]
@@ -209,7 +210,13 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                         });
                         }
                     }else if(newvalue[len-1].type == "game_rejected"){                        
-                        $scope.gameState = CONFIG.NOT_STARTED;
+                        $scope.gameState = CONFIG.NOT_STARTED;                        
+                        if($scope.uw_gameData){
+                            $scope.uw_gameData();
+                            $scope.uw_gameData = null;
+                        }
+                        $scope.enemy = "";                        
+                        
                         var confirm = $mdDialog.alert()                        
                         .title('Player Busy')
                         .content(newvalue[len-1].summoner.name + ' is playing a match. Pick someone else.')
@@ -368,6 +375,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //            $scope.roundData = roundData;            
             $scope.roundResult = result;            
             SetColor("myCard_" + $scope.round + "_" + roundData.key, statColor);
+            SetColor("enemyCard_" + roundData.key, CONFIG.HL_COLOR);
             
 //            $mdToast.show($mdToast.simple()
 //            .content('Round Result: ' + roundData.result)
@@ -416,10 +424,13 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
                 $scope.roundResult = result;
             }            
             SetColor("myCard_" + $scope.round + "_" + roundData.key, statColor);
+            SetColor("enemyCard_" + roundData.key, CONFIG.HL_COLOR);
+
             
             //increment the round number after the animation is done.
             setTimeout(function(){
                 ResetColor("myCard_" + $scope.round + "_" + roundData.key);
+                ResetColor("enemyCard_" + roundData.key);
                 $scope.round += 1;  
                 $scope.myRounds[$scope.round] = -2;
                 $scope.checkGameEnd();
@@ -442,7 +453,8 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 //                $scope.gameState = CONFIG.MY_TURN;
 //            }            
             ResetColor("myCard_" + $scope.round + "_" + roundData.key);
-            
+            ResetColor("enemyCard_" + roundData.key);
+
             $scope.round += 1;
             
             $scope.myRounds[$scope.round] = -2;
