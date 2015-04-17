@@ -39,7 +39,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
       
     //initialize the firebase data store.
     $scope.firebase_url = "https://lol-wars.firebaseio.com/";    
-    $scope.key = '4befbf6c-67bf-4d9e-b159-114aed30e108';
+    $scope.key = '';
         
     $scope.region = "euw";
     $scope.summonerInfo = "";
