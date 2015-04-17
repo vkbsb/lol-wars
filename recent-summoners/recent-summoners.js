@@ -31,7 +31,7 @@ app.controller("SummonerList", [
     }
     
 //    var url = "https://euw.api.pvp.net/api/lol/euw/v1.4/summoner/" + summonerList + "?api_key=" + $scope.key;
-    var url = $scope.SUMMONER_BY_ID + summonerList + "?api_key=" + $scope.key;
+    var url = $scope.SUMMONER_BY_ID + summonerList + "?api_key=" + atob($scope.key);
     $http.get(url).success(function(data){
         $scope.recentSummoners = data;
       

@@ -39,7 +39,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
       
     //initialize the firebase data store.
     $scope.firebase_url = "https://lol-wars.firebaseio.com/";    
-    $scope.key = '';
+    $scope.key = 'NGJlZmJmNmMtNjdiZi00ZDllLWIxNTktMTE0YWVkMzBlMTA4';
         
     $scope.region = "euw";
     $scope.summonerInfo = "";
@@ -81,7 +81,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
     if(localStorage.hasOwnProperty("champData")){
         $scope.champData = JSON.parse(localStorage["champData"]);
     }else{
-        $http.get("https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=all&api_key=" + $scope.key).success(function(data){
+        $http.get("https://global.api.pvp.net/api/lol/static-data/euw/v1.2/champion?champData=all&api_key=" + atob($scope.key)).success(function(data){
             localStorage["champData"] = JSON.stringify(data);
             $scope.champData = data;
         });
@@ -140,7 +140,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
 
 
 //     $http.get(base_path + 'summoner/by-name/' + $scope.summoner + '?api_key=' + $scope.key)
-     $http.get($scope.SUMMONER_BY_NAME + $scope.summoner + '?api_key=' + $scope.key)
+     $http.get($scope.SUMMONER_BY_NAME + $scope.summoner + '?api_key=' + atob($scope.key))
          .success(function(data) {
          $scope.fetching = false; 
          $scope.true = 0;
@@ -234,7 +234,7 @@ function($scope, $http, $firebaseArray, $mdDialog, $firebaseObject, CONFIG, $mdT
          
         //https://euw.api.pvp.net/api/lol/euw/v1.3/game/by-summoner/19248048/recent?api_key=4befbf6c-67bf-4d9e-b159-114aed30e108
 //        $http.get("https://euw.api.pvp.net/api/lol/euw/v1.3/game/by-summoner/"
-        $http.get($scope.SUMMONER_RECENT_GAMES + summonerId + "/recent?api_key=" + $scope.key)
+        $http.get($scope.SUMMONER_RECENT_GAMES + summonerId + "/recent?api_key=" + atob($scope.key))
             .success(function(recent){
                 localStorage["recent"] = JSON.stringify(recent);
                 $scope.recent = recent;
